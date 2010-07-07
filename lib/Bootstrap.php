@@ -2,6 +2,7 @@
 
 // Use php for the default extension
 spl_autoload_extensions(".php");
+
 // What function to call to load classess auto-magically
 spl_autoload_register(__NAMESPACE__ .'\Bootstrap::getClass');
 
@@ -34,12 +35,26 @@ class Bootstrap {
   public static function Initialize($debuglevel=0,$configpath='/etc/biophp/config.ini') {
 
     $config = null;
+    
     try{
-      $config = biophp\Config::singleton();
+      
+      $config = biophp\Config::getInstance();
+
     }catch(Exception $e) {
-      print "Error loading $e";
-    }   
-    $config->initialize($configpath); 
+      
+      throw new Exception("Error creating instance of the config singleton in Bootstrap class: $e");
+      
+    }
+    
+    if(is_object($config)) {
+      
+      $config->initialize($configpath);
+      
+    } else {
+      
+      throw new Exception("Error initializing the configuration singleton in the bootstrap class");
+      
+    }
   }
   
   
@@ -54,14 +69,18 @@ class Bootstrap {
    * The beauty of this function is that classes (files) are only loaded as
    * needed.  
    */
-  public static function getClass($classname) {  
+  public static function getClass($classname) {
+    
     $classfile = __DIR__."/".str_replace('\\','/',$classname).".php";
+    
     if (is_file("$classfile")) {
+      
       require_once($classfile);
+      
     } else {
+      
       throw new \Exception("Unable to load class $classname in file $classfile");
+      
     }
   }
 }
-
-?>

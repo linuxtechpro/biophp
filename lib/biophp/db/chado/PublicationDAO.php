@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Publication Data Access Object. 
  * Data access object that provides methods for interfacing with
@@ -12,4 +13,11 @@
 
 
 
+PublicationDAO extends BaseDAO {
+
+
+
+
+
+}
 

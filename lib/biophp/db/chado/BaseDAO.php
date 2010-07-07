@@ -1,6 +1,6 @@
 <?php
 
-namespace biophp/db/chado/BaseDAO 
+namespace biophp\db\chado\BaseDAO;
 
 /** 
  * Base data access object
