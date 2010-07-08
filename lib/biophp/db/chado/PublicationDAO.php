@@ -1,4 +1,5 @@
 <?php
+namespace biophp\db\chado;
 
 /**
  * Publication Data Access Object. 
@@ -13,9 +14,17 @@
 
 
 
-PublicationDAO extends BaseDAO {
+class PublicationDAO extends BaseDAO {
 
 
+  /**
+   * Constructor
+   */
+  public function __construct() {
+    
+    parent::__construct();  // Call parent constructor
+    
+  }
 
 
 

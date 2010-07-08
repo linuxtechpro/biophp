@@ -1,4 +1,43 @@
 README File for biophp
 
-This software distribution contains php classes which can do useful things
-with php.
+What is this?
+
+BioPHP is yet another rendition of BioPHP that aims to build on some of the other
+BioPHP implementations and focus more on data management.
+
+Why is it needed?
+
+Perl, Java, and Python maintain a very active community with regards to bioinformatics.  This
+is an attempt to provide a bioinformatics component for PHP.  Our shop currently utilizes
+a content management framework called Drupal for model organism databases.  While Drupal provides
+a very flexible framework, there is not a good API for bioinformatics.  So as I develop code, I plan
+on enhancing this library.
+
+
+
+This software library is very new and I am actively developing it.  For now, you may
+find a few useful things that you can use.  
+
+The plan is as follows:
+
+1.  Add chado database interfaces
+    a.  Object oriented database interface that can be extended for your own needs.
+    b.  Based on PHP PDO for maximum flexibility.
+    c.  Can be used as a database library to quickly build php based applications for chado
+2.  Add sequence manipulation and import functionality for chado
+    a.  Add sequence manipulation and utility functions.
+    b.  Add ability to work with different file formats.
+3.  Add Analysis tools and data management for analysis tools, like BLAST and FASTA. 
+
+
+LICENSE:
+
+Released under the GNU Public License Version 3
+
+http://www.gnu.org/licenses/quick-guide-gplv3.html
+
+Disclaimer:
+
+I am not responsible for any damages caused by this software
+library.  You use it at your own risk.
+

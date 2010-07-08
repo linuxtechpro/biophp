@@ -6,6 +6,7 @@ namespace biophp;
  * it into a singleton object for other classes to use.  We want to use a singleton
  * pattern to avoid parsing and reading the configuration file everytime we need to
  * obtain information.
+ * @author Randall Svancara
  */
 
 class Config {
@@ -17,12 +18,18 @@ class Config {
    */
   private static $bioconfig_instance;
   
+  /**
+   * database profile to use
+   */
+  
+  private $dbprofile;
+  
   
   private $config_array;
 
   /**
-   *  Create a private constructor
-   *
+   * Create a private constructor
+   * 
    */
   private function __construct() {
     // Do nothing
@@ -31,7 +38,7 @@ class Config {
 
   /**
    * Get the current instance of bioconfig
-   * @return A bioconfig object 
+   * @return Config A bioconfig object 
    */
   public static function getInstance() {
   
@@ -70,6 +77,7 @@ class Config {
     } else {
       
       throw new \Exception("Could not locate configuration file at $path");
+      
     }
 
   }
@@ -105,7 +113,7 @@ class Config {
   }
   
   /**
-   *  Get a database profile from the ini file
+   * Get a database profile from the ini file
    * @param String $profile The profile name, [profile name]
    * @return Array An array of the database configuration options
    */
@@ -137,6 +145,61 @@ class Config {
     
     return $ret_array;
 
+  }
+  
+  /**
+   * Get the DSN for the provided profile
+   * @param String $profile Profile name
+   * @return String DSN
+   */
+  public function getDSNforProfile ($profile) {
+    
+    $dsn = null;
+    
+    $config_array = $this->getDatabaseProfile($profile);
+    
+    if (is_array($config_array)) {
+      
+      $dsn = $config_array[$profile]["prefix"] . ":" .
+             "host=" . $config_array[$profile]["host"] . ";" .
+             "port=" . $config_array[$profile]["port"] . ";" .
+             "dbname=" . $config_array[$profile]["database"] . ";" .
+             "user=" . $config_array[$profile]["user"] . ";" .
+             "password=" . $config_array[$profile]["pass"];
+             
+    }
+    
+    return $dsn;
+        
+  }
+  
+  
+  
+  /**
+   * Magic setter
+   */
+  public function __set($name, $value) {
+
+    $this->$name = $value;
+    
+  }
+  
+  /**
+   * Magic getter
+   */
+  public function __get($name) {
+    
+    if(isset($this->$name)) {
+      
+      return $this->$name;
+    
+    } else {
+      
+      throw new \Exception("Unable to find property $name in Config class.");
+      
+    }
+    
+  
   }
 
 }
