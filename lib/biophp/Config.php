@@ -198,7 +198,6 @@ class Config {
       throw new \Exception("Unable to find property $name in Config class.");
       
     }
-    
   
   }
 

@@ -55,6 +55,7 @@ class Bootstrap {
       throw new Exception("Error initializing the configuration singleton in the bootstrap class");
       
     }
+
   }
   
   

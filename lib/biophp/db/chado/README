@@ -1,8 +1,3 @@
-This directory contains classes for accessing a chado database.  Classes are organized on a per 
-module basis.  This means for each module, there will be a class that contains methods related to
-a chado module.  For example, the publication module contains pub_dbxref, pub, pubprop and pubauthors. 
-In this case, the publication class would provide all the methods necessary for interfacing with 
-these tables.  This design choice was made becuase most of the time, independently these tables
-do not have much meaning and must be joined to obtain anything useful.
+This directory contains the database access objects 
 
 

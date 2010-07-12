@@ -23,7 +23,9 @@ $config->dbprofile = "database_profile";
 
 print "\nThe default profile is: " .  $config->dbprofile . "\n";
 
-$pubdb = new biophp\db\chado\PublicationDAO();
+$pubdb = new biophp\db\Database();
+
+//$pub = new biophp\db\chado\model\Pub();
 
 
 
