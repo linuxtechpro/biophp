@@ -6,7 +6,7 @@
 // Load Bootstrap
 require_once "../lib/Bootstrap.php";
 
-Bootstrap::Initialize(0,"../etc/config.ini");
+Bootstrap::Initialize(0,"/etc/biophp/config.ini");
 
 $config = biophp\Config::getInstance();
 
@@ -23,7 +23,20 @@ $config->dbprofile = "database_profile";
 
 print "\nThe default profile is: " .  $config->dbprofile . "\n";
 
-$pubdb = new biophp\db\Database();
+$result = biophp\db\Database::getConnection()
+  ->query("select * from pub",NULL,NULL);
+
+
+while($row = $result->fetchObject()) {
+  print $row->pub_id . "\n";
+}
+
+//$statement = new biophp\db\DatabaseStatementBase($conn);
+
+//$statement->execute();
+
+//$conn->query("select * from pub");
+
 
 //$pub = new biophp\db\chado\model\Pub();
 

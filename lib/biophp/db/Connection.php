@@ -3,18 +3,22 @@
 namespace biophp\db;
 
 /** 
- * Base database object
+ * Database connection object
  * 
  * Provides connection and logging frame work for classes
  * that inherit from it.
- * 
  * 
  * @author Randall Svancara
  */
 
 class Connection extends \PDO{
 
-  protected $dsn = NULL;
+    /**
+   * The name of the Statement class for this connection.
+   *
+   * @var string
+   */
+  protected $statementClass = 'biophp\db\DatabaseStatementBase';
   
   //protected $connection = NULL;
   
@@ -31,16 +35,16 @@ class Connection extends \PDO{
   /**
    * Default constructor
    */
-  function __construct(){
+  function __construct($dsn){
     
     // Get the instance of the class 
-    $config = \biophp\Config::getInstance();
+    //$config = \biophp\Config::getInstance();
     
-    $driver_options = NULL;
+    //$driver_options = NULL;
     
     // Get the dsn for the current profile that should have
     // been set when the configuration was initialized.  
-    $this->dsn = $config->getDSNforProfile($config->dbprofile,NULL,NULL,$driver_options);
+    //$this->dsn = $config->getDSNforProfile($config->dbprofile,NULL,NULL,$driver_options);
     
     // Create the database handle
     try {
@@ -50,10 +54,16 @@ class Connection extends \PDO{
       $driver_options[\PDO::ATTR_STRINGIFY_FETCHES] = TRUE;
       $driver_options[\PDO::ATTR_CASE] = \PDO::CASE_LOWER;
         
-      parent::__construct($this->dsn,NULL,NULL,$driver_options);
+      parent::__construct($dsn,NULL,NULL,$driver_options);
       
       // Force PostgreSQL to use the UTF-8 character set by default.
       $this->exec("SET NAMES 'UTF8'");
+      
+      // Set a specific PDOStatement class if the driver requires that.
+      if (!empty($this->statementClass)) {
+        $this->setAttribute(\PDO::ATTR_STATEMENT_CLASS, array($this->statementClass, array($this)));
+      }
+      
       
     } catch ( \PDOException $pe) {
         
@@ -65,6 +75,81 @@ class Connection extends \PDO{
         
     } 
 
+  }
+
+  /**
+   * Prepares a query string and returns the prepared statement.
+   *
+   * This method caches prepared statements, reusing them when
+   * possible. It also prefixes tables names enclosed in curly-braces.
+   *
+   * @param $query
+   *   The query string as SQL, with curly-braces surrounding the
+   *   table names.
+   *
+   * @return DatabaseStatementInterface
+   *   A PDO prepared statement ready for its execute() method.
+   */
+  public function prepareQuery($query) {
+    //$query = $this->prefixTables($query);
+
+    // Call PDO::prepare.
+    return parent::prepare($query);
+  }
+
+  
+  /**
+   * Returns the default query options for any given query.
+   *
+   * A given query can be customized with a number of option flags in an
+   * associative array:
+   * - target: The database "target" against which to execute a query. Valid
+   *   values are "default" or "slave". The system will first try to open a
+   *   connection to a database specified with the user-supplied key. If one
+   *   is not available, it will silently fall back to the "default" target.
+   *   If multiple databases connections are specified with the same target,
+   *   one will be selected at random for the duration of the request.
+   * - fetch: This element controls how rows from a result set will be
+   *   returned. Legal values include PDO::FETCH_ASSOC, PDO::FETCH_BOTH,
+   *   PDO::FETCH_OBJ, PDO::FETCH_NUM, or a string representing the name of a
+   *   class. If a string is specified, each record will be fetched into a new
+   *   object of that class. The behavior of all other values is defined by PDO.
+   *   See http://www.php.net/PDOStatement-fetch
+   * - return: Depending on the type of query, different return values may be
+   *   meaningful. This directive instructs the system which type of return
+   *   value is desired. The system will generally set the correct value
+   *   automatically, so it is extremely rare that a module developer will ever
+   *   need to specify this value. Setting it incorrectly will likely lead to
+   *   unpredictable results or fatal errors. Legal values include:
+   *   - Database::RETURN_STATEMENT: Return the prepared statement object for
+   *     the query. This is usually only meaningful for SELECT queries, where
+   *     the statement object is how one accesses the result set returned by the
+   *     query.
+   *   - Database::RETURN_AFFECTED: Return the number of rows affected by an
+   *     UPDATE or DELETE query. Be aware that means the number of rows actually
+   *     changed, not the number of rows matched by the WHERE clause.
+   *   - Database::RETURN_INSERT_ID: Return the sequence ID (primary key)
+   *     created by an INSERT statement on a table that contains a serial
+   *     column.
+   *   - Database::RETURN_NULL: Do not return anything, as there is no
+   *     meaningful value to return. That is the case for INSERT queries on
+   *     tables that do not contain a serial column.
+   * - throw_exception: By default, the database system will catch any errors
+   *   on a query as an Exception, log it, and then rethrow it so that code
+   *   further up the call chain can take an appropriate action. To suppress
+   *   that behavior and simply return NULL on failure, set this option to
+   *   FALSE.
+   *
+   * @return
+   *   An array of default query options.
+   */
+  protected function defaultOptions() {
+    return array(
+      'target' => 'default',
+      'fetch' => \PDO::FETCH_OBJ,
+      'return' => Database::RETURN_STATEMENT,
+      'throw_exception' => TRUE,
+    );
   }
   
   /**
@@ -109,12 +194,11 @@ class Connection extends \PDO{
       // We allow either a pre-bound statement object or a literal string.
       // In either case, we want to end up with an executed statement object,
       // which we pass to PDOStatement::execute.
-      if ($query instanceof DatabaseStatementInterface) {
+      if ($query instanceof biophp\db\DatabaseStatementInterface) {
         $stmt = $query;
         $stmt->execute(NULL, $options);
       }
       else {
-        $this->expandArguments($query, $args);
         $stmt = $this->prepareQuery($query);
         $stmt->execute($args, $options);
       }
