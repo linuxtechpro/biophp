@@ -24,12 +24,17 @@ $config->dbprofile = "database_profile";
 print "\nThe default profile is: " .  $config->dbprofile . "\n";
 
 $result = biophp\db\Database::getConnection()
-  ->query("select * from pub",NULL,NULL);
-
+  ->query("select * from pub",array(),array());
 
 while($row = $result->fetchObject()) {
   print $row->pub_id . "\n";
 }
+
+$select = new biophp\db\SelectQuery("pub","p");
+$select->addField("pub_id","pub_id","p");
+$select->addField("title","title","p");
+
+
 
 //$statement = new biophp\db\DatabaseStatementBase($conn);
 
