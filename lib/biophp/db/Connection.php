@@ -7,6 +7,8 @@ namespace biophp\db;
  * 
  * Provides connection and logging frame work for classes
  * that inherit from it.
+ *
+ * //TODO, make a connection factory to support multiple databases
  * 
  * @author Randall Svancara
  */
