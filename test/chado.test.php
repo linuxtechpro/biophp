@@ -24,7 +24,7 @@ $config->dbprofile = "database_profile";
 print "\nThe default profile is: " .  $config->dbprofile . "\n";
 
 $result = biophp\db\Database::getConnection()
-  ->query("select * from pub",NULL,NULL);
+  ->query("select * from pub",array(),array());
 
 
 while($row = $result->fetchObject()) {
